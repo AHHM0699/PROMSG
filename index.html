@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>PROMSG — Agendar WhatsApp</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f5f5f7;
+      --card: #ffffff;
+      --text: #1d1d1f;
+      --muted: #6e6e73;
+      --border: #d2d2d7;
+      --accent: #25d366;
+      --accent-dark: #128c7e;
+      --blue: #007aff;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #000000;
+        --card: #1c1c1e;
+        --text: #f5f5f7;
+        --muted: #8e8e93;
+        --border: #3a3a3c;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    }
+    main {
+      max-width: 560px;
+      margin: 0 auto;
+      padding: 24px 16px 48px;
+    }
+    h1 { font-size: 24px; margin: 0 0 4px; }
+    p.lead { color: var(--muted); margin: 0 0 24px; font-size: 15px; }
+    .card {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 16px;
+      border: 1px solid var(--border);
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-family: inherit;
+    }
+    textarea { min-height: 120px; resize: vertical; }
+    .row { margin-bottom: 14px; }
+    .hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
+    .grid { display: grid; grid-template-columns: 120px 1fr; gap: 8px; }
+    button {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    button.primary { background: var(--accent); color: white; }
+    button.primary:active { background: var(--accent-dark); }
+    button.secondary { background: var(--blue); color: white; margin-top: 10px; }
+    .actions { display: none; margin-top: 16px; }
+    .actions.visible { display: block; }
+    .preview {
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 14px;
+      border: 1px solid var(--border);
+      word-break: break-word;
+      margin-bottom: 12px;
+    }
+    .preview strong { display: block; color: var(--muted); font-size: 12px; text-transform: uppercase; margin-bottom: 4px; }
+    a.wa-link {
+      display: block;
+      padding: 14px;
+      background: var(--accent);
+      color: white;
+      text-align: center;
+      text-decoration: none;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 17px;
+    }
+    a.wa-link:active { background: var(--accent-dark); }
+    footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 24px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Agendar WhatsApp</h1>
+    <p class="lead">Genera un enlace de WhatsApp con tu mensaje y un recordatorio para el Calendario.</p>
+
+    <form id="form" class="card" novalidate>
+      <div class="row">
+        <label for="country">Código país</label>
+        <div class="grid">
+          <input id="country" type="text" inputmode="numeric" placeholder="52" value="52" />
+          <input id="phone" type="tel" inputmode="numeric" placeholder="5551234567" required />
+        </div>
+        <div class="hint">Sin signos ni espacios. Ej: país 52, número 5551234567.</div>
+      </div>
+
+      <div class="row">
+        <label for="message">Mensaje</label>
+        <textarea id="message" placeholder="Escribe el mensaje tal cual se enviará" required></textarea>
+      </div>
+
+      <div class="row">
+        <label for="when">Fecha y hora del recordatorio</label>
+        <input id="when" type="datetime-local" required />
+      </div>
+
+      <div class="row">
+        <label for="title">Título del evento (opcional)</label>
+        <input id="title" type="text" placeholder="Enviar WhatsApp" />
+      </div>
+
+      <button type="submit" class="primary">Generar</button>
+    </form>
+
+    <div id="actions" class="actions">
+      <div class="card">
+        <div class="preview">
+          <strong>Destino</strong>
+          <span id="previewPhone"></span>
+        </div>
+        <div class="preview">
+          <strong>Mensaje</strong>
+          <span id="previewMessage"></span>
+        </div>
+        <div class="preview">
+          <strong>Recordatorio</strong>
+          <span id="previewWhen"></span>
+        </div>
+        <a id="waLink" class="wa-link" href="#" target="_blank" rel="noopener">Abrir WhatsApp ahora</a>
+        <button id="downloadIcs" class="secondary" type="button">Descargar recordatorio (.ics)</button>
+        <div class="hint" style="margin-top:10px">En iPhone: toca el archivo `.ics` descargado y agrégalo a tu Calendario. Recibirás la notificación a la hora indicada; al tocar el evento se abrirá WhatsApp con el mensaje listo para enviar.</div>
+      </div>
+    </div>
+
+    <footer>PROMSG · funciona 100 % offline en tu navegador</footer>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
