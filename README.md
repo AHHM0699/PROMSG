@@ -10,9 +10,16 @@ Página estática para agendar el envío de un mensaje de WhatsApp sin servidore
    - Un archivo `.ics` con un evento de Calendario que incluye ese mismo enlace y una alerta a la hora elegida.
 3. Al llegar la hora, tu iPhone te manda la notificación del Calendario. Tocas el evento, tocas el enlace y WhatsApp se abre con el mensaje listo. Solo falta pulsar "enviar".
 
+## Despliegue (GitHub Pages)
+
+El repo incluye `.github/workflows/pages.yml`, que despliega automáticamente en cada push. **Un solo paso manual la primera vez:**
+
+1. En GitHub: `Settings` → `Pages` → en **Source** selecciona `GitHub Actions`.
+2. El siguiente push dispara el workflow `Deploy to GitHub Pages`. La URL aparece en `Actions` → último run → `deploy` → `page_url`, y también en `Settings → Pages`.
+
 ## Uso en iPhone
 
-1. Abre `index.html` en Safari (desde iCloud Drive, AirDrop, un servidor local o GitHub Pages).
+1. Abre la URL de GitHub Pages en Safari (o `index.html` local desde iCloud Drive / AirDrop).
 2. Llena el formulario y toca **Generar**.
 3. Toca **Descargar recordatorio (.ics)**. Safari ofrecerá abrirlo con Calendario: confirma y añade el evento.
 4. Opcional: toca **Abrir WhatsApp ahora** si quieres enviarlo de inmediato en vez de programarlo.
