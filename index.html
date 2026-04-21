@@ -106,6 +106,36 @@
       font-size: 17px;
     }
     a.wa-link:active { background: var(--accent-dark); }
+    .phone-group {
+      display: flex;
+      align-items: stretch;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      background: var(--bg);
+    }
+    .phone-group input {
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      padding: 12px 10px;
+    }
+    .phone-group input:focus { outline: none; }
+    .phone-group .plus {
+      display: inline-flex;
+      align-items: center;
+      padding: 0 10px 0 14px;
+      color: var(--muted);
+      font-size: 16px;
+    }
+    .phone-group .country-input {
+      width: 56px;
+      padding-left: 0;
+      padding-right: 6px;
+      border-right: 1px solid var(--border);
+      text-align: center;
+    }
+    .phone-group .phone-input { flex: 1; }
     .contacts-list {
       display: flex;
       flex-wrap: wrap;
@@ -172,9 +202,13 @@
 
     <form id="form" class="card" novalidate>
       <div class="row">
-        <label for="phone">Teléfono (con código de país)</label>
-        <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="51999123456" value="51" required />
-        <div class="hint">Por defecto Perú (<b>+51</b>). Se aceptan `+`, espacios y guiones; se normalizan automáticamente.</div>
+        <label for="phone">Teléfono</label>
+        <div class="phone-group">
+          <span class="plus">+</span>
+          <input id="country" name="country" class="country-input" type="tel" inputmode="numeric" autocomplete="tel-country-code" placeholder="51" value="51" maxlength="4" required />
+          <input id="phone" name="phone" class="phone-input" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="999 123 456" required />
+        </div>
+        <div class="hint">Por defecto <b>+51 (Perú)</b>. Cambia el código para otro país. Acepta espacios y guiones en el número; se normalizan automáticamente.</div>
         <button id="pickContact" type="button" class="secondary" hidden style="margin-top:10px">Elegir desde Contactos (Android)</button>
       </div>
 
