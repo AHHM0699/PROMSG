@@ -106,6 +106,62 @@
       font-size: 17px;
     }
     a.wa-link:active { background: var(--accent-dark); }
+    .contacts-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+      min-height: 8px;
+    }
+    .contacts-list:empty::before {
+      content: "— aún no hay contactos guardados —";
+      color: var(--muted);
+      font-size: 13px;
+      font-style: italic;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      font-size: 14px;
+      cursor: pointer;
+      color: var(--text);
+      font-family: inherit;
+    }
+    .chip:active { background: var(--border); }
+    .chip .x {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--border);
+      color: var(--text);
+      font-size: 12px;
+      line-height: 1;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+    }
+    .chip .x:active { background: var(--muted); color: var(--card); }
+    .save-contact { display: flex; gap: 8px; }
+    .save-contact input { flex: 1; }
+    button.ghost {
+      background: transparent;
+      color: var(--blue);
+      border: 1px solid var(--blue);
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 15px;
+      width: auto;
+      flex-shrink: 0;
+    }
+    button.ghost:active { background: var(--blue); color: white; }
     footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 24px; }
   </style>
 </head>
@@ -118,8 +174,18 @@
       <div class="row">
         <label for="phone">Teléfono (con código de país)</label>
         <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="51999123456" value="51" required />
-        <div class="hint">Por defecto Perú (<b>+51</b>). Al tocar el campo en iPhone, arriba del teclado aparece la sugerencia QuickType con números de tus Contactos. Se aceptan `+`, espacios y guiones; se normalizan automáticamente.</div>
-        <button id="pickContact" type="button" class="secondary" hidden style="margin-top:10px">Elegir desde Contactos</button>
+        <div class="hint">Por defecto Perú (<b>+51</b>). Se aceptan `+`, espacios y guiones; se normalizan automáticamente.</div>
+        <button id="pickContact" type="button" class="secondary" hidden style="margin-top:10px">Elegir desde Contactos (Android)</button>
+      </div>
+
+      <div class="row">
+        <label>Contactos guardados</label>
+        <div id="contactsList" class="contacts-list"></div>
+        <div class="save-contact">
+          <input id="newContactName" type="text" placeholder="Nombre (para guardar el número actual)" autocomplete="off" />
+          <button id="saveContact" type="button" class="ghost">Guardar</button>
+        </div>
+        <div class="hint">Guarda aquí tus contactos frecuentes: persisten en este dispositivo. iOS Safari no puede leer Contactos nativos por seguridad.</div>
       </div>
 
       <div class="row">

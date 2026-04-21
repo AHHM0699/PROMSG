@@ -1,6 +1,8 @@
 (() => {
   const DEFAULT_COUNTRY_CODE = '51';
 
+  const STORAGE_KEY = 'promsg.contacts.v1';
+
   const form = document.getElementById('form');
   const actions = document.getElementById('actions');
   const waLink = document.getElementById('waLink');
@@ -10,6 +12,9 @@
   const previewPhone = document.getElementById('previewPhone');
   const previewMessage = document.getElementById('previewMessage');
   const previewWhen = document.getElementById('previewWhen');
+  const contactsList = document.getElementById('contactsList');
+  const newContactName = document.getElementById('newContactName');
+  const saveContactBtn = document.getElementById('saveContact');
 
   let lastIcs = null;
   let lastFilename = 'recordatorio.ics';
@@ -147,6 +152,88 @@
     actions.classList.add('visible');
     actions.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
+
+  const loadContacts = () => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  };
+
+  const persistContacts = (list) => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    } catch (err) {
+      console.error('No se pudo guardar contactos:', err);
+    }
+  };
+
+  const renderContacts = () => {
+    const list = loadContacts();
+    contactsList.innerHTML = '';
+    list
+      .slice()
+      .sort((a, b) => a.name.localeCompare(b.name, 'es'))
+      .forEach((c) => {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'chip';
+        chip.setAttribute('aria-label', `Usar ${c.name} (+${c.phone})`);
+
+        const label = document.createElement('span');
+        label.textContent = c.name;
+        chip.appendChild(label);
+
+        const x = document.createElement('button');
+        x.type = 'button';
+        x.className = 'x';
+        x.textContent = '×';
+        x.setAttribute('aria-label', `Borrar ${c.name}`);
+        x.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          if (!confirm(`Borrar contacto "${c.name}"?`)) return;
+          const remaining = loadContacts().filter((x) => x.phone !== c.phone || x.name !== c.name);
+          persistContacts(remaining);
+          renderContacts();
+        });
+        chip.appendChild(x);
+
+        chip.addEventListener('click', () => {
+          phoneInput.value = '+' + c.phone;
+        });
+        contactsList.appendChild(chip);
+      });
+  };
+
+  saveContactBtn.addEventListener('click', () => {
+    const name = newContactName.value.trim();
+    const phone = normalizePhone(phoneInput.value);
+    if (!name) {
+      alert('Escribe un nombre para guardar.');
+      newContactName.focus();
+      return;
+    }
+    if (!phone || phone.length < 8) {
+      alert('El teléfono actual no es válido.');
+      phoneInput.focus();
+      return;
+    }
+    const list = loadContacts();
+    if (list.some((c) => c.phone === phone)) {
+      alert('Ya tienes un contacto con ese número.');
+      return;
+    }
+    list.push({ name, phone });
+    persistContacts(list);
+    newContactName.value = '';
+    renderContacts();
+  });
+
+  renderContacts();
 
   if ('contacts' in navigator && typeof navigator.contacts.select === 'function') {
     pickContactBtn.hidden = false;
