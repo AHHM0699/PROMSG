@@ -26,7 +26,9 @@ El repo incluye `.github/workflows/pages.yml`, que despliega automáticamente en
 
 ## Notas
 
-- El número se debe escribir en formato internacional sin `+` ni espacios (ej. país `52`, número `5551234567`).
+- El código de país por defecto es **+51 (Perú)**: si escribes solo el número local se antepone automáticamente. Para otro país, escribe con `+` al inicio (ej. `+52 55 1234 5678`) y se respetará tal cual.
+- En iPhone, al tocar el campo de teléfono, la barra QuickType del teclado sugiere números de tus **Contactos** gracias a `autocomplete="tel"`. iOS Safari no expone una API de selector de contactos, así que esa sugerencia es lo más cercano a un picker nativo.
+- En navegadores que sí soportan el Contact Picker API (Chrome/Edge en Android sobre HTTPS) aparece además el botón **Elegir desde Contactos**.
 - La hora del evento usa la zona horaria local de tu dispositivo y se guarda en UTC dentro del `.ics`.
 - iOS no permite enviar un WhatsApp de forma 100 % autónoma: siempre requerirás un toque final para enviar. Este enfoque reduce los pasos al mínimo sin depender de Atajos.
 

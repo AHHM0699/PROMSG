@@ -1,8 +1,12 @@
 (() => {
+  const DEFAULT_COUNTRY_CODE = '51';
+
   const form = document.getElementById('form');
   const actions = document.getElementById('actions');
   const waLink = document.getElementById('waLink');
   const downloadBtn = document.getElementById('downloadIcs');
+  const pickContactBtn = document.getElementById('pickContact');
+  const phoneInput = document.getElementById('phone');
   const previewPhone = document.getElementById('previewPhone');
   const previewMessage = document.getElementById('previewMessage');
   const previewWhen = document.getElementById('previewWhen');
@@ -11,6 +15,17 @@
   let lastFilename = 'recordatorio.ics';
 
   const sanitizeDigits = (s) => (s || '').replace(/\D+/g, '');
+
+  const normalizePhone = (raw) => {
+    if (!raw) return '';
+    const trimmed = String(raw).trim();
+    const hasPlus = trimmed.startsWith('+');
+    const digits = sanitizeDigits(trimmed);
+    if (!digits) return '';
+    if (hasPlus) return digits;
+    if (digits.length <= 9) return DEFAULT_COUNTRY_CODE + digits;
+    return digits;
+  };
 
   const pad = (n) => String(n).padStart(2, '0');
 
@@ -96,14 +111,13 @@
   form.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    const country = sanitizeDigits(document.getElementById('country').value);
-    const phone = sanitizeDigits(document.getElementById('phone').value);
+    const phoneDigits = normalizePhone(phoneInput.value);
     const message = document.getElementById('message').value.trim();
     const whenRaw = document.getElementById('when').value;
     const title = document.getElementById('title').value;
 
-    if (!country || !phone) {
-      alert('Falta el número de destino.');
+    if (!phoneDigits || phoneDigits.length < 8) {
+      alert('Número de destino inválido.');
       return;
     }
     if (!message) {
@@ -120,8 +134,6 @@
       alert('Fecha y hora inválidas.');
       return;
     }
-
-    const phoneDigits = country + phone;
     const waUrl = buildWaUrl(phoneDigits, message);
 
     waLink.href = waUrl;
@@ -135,6 +147,26 @@
     actions.classList.add('visible');
     actions.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
+
+  if ('contacts' in navigator && typeof navigator.contacts.select === 'function') {
+    pickContactBtn.hidden = false;
+    pickContactBtn.addEventListener('click', async () => {
+      try {
+        const contacts = await navigator.contacts.select(['tel', 'name'], { multiple: false });
+        if (!contacts || contacts.length === 0) return;
+        const c = contacts[0];
+        const tel = Array.isArray(c.tel) && c.tel.length ? c.tel[0] : '';
+        if (!tel) {
+          alert('Ese contacto no tiene número.');
+          return;
+        }
+        phoneInput.value = tel;
+      } catch (err) {
+        console.error(err);
+        alert('No se pudo abrir Contactos: ' + err.message);
+      }
+    });
+  }
 
   downloadBtn.addEventListener('click', () => {
     if (!lastIcs) return;

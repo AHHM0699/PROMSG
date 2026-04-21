@@ -116,12 +116,10 @@
 
     <form id="form" class="card" novalidate>
       <div class="row">
-        <label for="country">Código país</label>
-        <div class="grid">
-          <input id="country" type="text" inputmode="numeric" placeholder="52" value="52" />
-          <input id="phone" type="tel" inputmode="numeric" placeholder="5551234567" required />
-        </div>
-        <div class="hint">Sin signos ni espacios. Ej: país 52, número 5551234567.</div>
+        <label for="phone">Teléfono (con código de país)</label>
+        <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="51999123456" value="51" required />
+        <div class="hint">Por defecto Perú (<b>+51</b>). Al tocar el campo en iPhone, arriba del teclado aparece la sugerencia QuickType con números de tus Contactos. Se aceptan `+`, espacios y guiones; se normalizan automáticamente.</div>
+        <button id="pickContact" type="button" class="secondary" hidden style="margin-top:10px">Elegir desde Contactos</button>
       </div>
 
       <div class="row">
